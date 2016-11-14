@@ -10,18 +10,24 @@
 import DataType from 'sequelize';
 import Model from '../sequelize';
 
-const UserLogin = Model.define('UserLogin', {
-
-  name: {
-    type: DataType.STRING(50),
+const Session = Model.define('Session', {
+  sid: {
+    type: DataType.STRING,
     primaryKey: true,
   },
-
-  key: {
-    type: DataType.STRING(100),
-    primaryKey: true,
+  expires: DataType.DATE,
+  data: DataType.STRING(50000),
+  createdAt: {
+    type: DataType.DATE,
+  },
+  updatedAt: {
+    type: DataType.DATE,
   },
 
+}, {
+
+  freezeTableName: true,
+  tableName: 'sessions',
 });
 
-export default UserLogin;
+export default Session;
