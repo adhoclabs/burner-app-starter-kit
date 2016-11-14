@@ -16,23 +16,10 @@ export default {
 
   path: '/',
 
-  async action() {
-    const resp = await fetch('/graphql', {
-      method: 'post',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: '{news{title,link,contentSnippet}}',
-      }),
-      credentials: 'include',
-    });
-    const { data } = await resp.json();
-    if (!data || !data.news) throw new Error('Failed to load the news feed.');
+  action() {
     return {
-      title: 'React Starter Kit',
-      component: <Layout><Home news={data.news} /></Layout>,
+      title: 'Burner App Starter Kit',
+      component: <Layout><Home /></Layout>,
     };
   },
 
