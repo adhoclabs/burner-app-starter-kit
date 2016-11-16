@@ -8,3 +8,6 @@ npm-debug.log
 
 # WebStorm
 .idea/
+
+# Server-side environment variables
+.env

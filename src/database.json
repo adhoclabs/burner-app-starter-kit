@@ -1,10 +1,6 @@
 {
   "development": {
-    "username": "postgres",
-    "password": null,
-    "database": "burner-app-starter-kit-development",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
+    "use_env_variable": "DATABASE_URL"
   },
   "production": {
     "use_env_variable": "DATABASE_URL"

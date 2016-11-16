@@ -8,7 +8,9 @@
  */
 
 import React from 'react';
+import fetch from '../../core/fetch';
 import BurnerCookie from '../../core/BurnerCookie';
+import Home from '../home/Home';
 
 const title = 'Dashboard';
 
@@ -17,8 +19,22 @@ export default {
   path: '/dashboard',
 
   async action() {
+    // If we are not authenticated...
     if (!BurnerCookie.isAuthenticated()) {
-      return { redirect: '/login' };
+      // If this route is firing client-side...
+      if (window) {
+        // ...fetch the OAuth URI from the server and redirect.
+        const response = await fetch('/api/oauth-uri');
+        const OAUTH_URI = await response.text();
+
+        window.location = OAUTH_URI;
+
+        // Simply re-render the homepage
+        return {
+          title: 'Burner App Starter Kit',
+          component: <Home />,
+        };
+      }
     }
 
     const Dashboard = await new Promise((resolve) => {

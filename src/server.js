@@ -13,8 +13,6 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import expressJwt from 'express-jwt';
-import expressGraphQL from 'express-graphql';
-import jwt from 'jsonwebtoken';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
@@ -27,6 +25,7 @@ import models from './data/models';
 import routes from './routes';
 import assets from './assets'; // eslint-disable-line import/no-unresolved
 import { port, auth } from './config';
+import { OAUTH_URI } from './constants/oauth';
 
 const app = express();
 
@@ -53,6 +52,14 @@ app.use(expressJwt({
   credentialsRequired: false,
   getToken: req => req.cookies.id_token,
 }));
+
+//
+// OAuth
+// -----------------------------------------------------------------------------
+
+app.get('/api/oauth-uri', async (req, res) => {
+  res.send(OAUTH_URI);
+});
 
 //
 // Register server-side rendering middleware
