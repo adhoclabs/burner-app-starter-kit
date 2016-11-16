@@ -89,6 +89,11 @@ app.get('*', async (req, res, next) => {
       return;
     }
 
+    if (route.oauthRedirect) {
+      res.redirect(OAUTH_URI);
+      return;
+    }
+
     const data = { ...route };
     data.children = ReactDOM.renderToString(<App context={context}>{route.component}</App>);
     data.style = [...css].join('');

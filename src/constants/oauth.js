@@ -7,7 +7,7 @@ const OAUTH_SCOPES = 'messages:connect burners:read burners:write contacts:write
 const OAUTH_CREDS = {
   client: {
     id: process.env.BURNER_APP_STARTER_KIT_OAUTH_CLIENT_ID,
-    secret: process.env.BURNER_APP_STARTER_KIT_OAUTH_CLIENT_SECRET
+    secret: process.env.BURNER_APP_STARTER_KIT_OAUTH_CLIENT_SECRET,
   },
   auth: {
     authorizeHost: process.env.BURNER_APP_STARTER_KIT_OAUTH_AUTHORIZE_HOST,

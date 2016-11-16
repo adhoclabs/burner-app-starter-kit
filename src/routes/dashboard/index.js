@@ -7,6 +7,8 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
+/* eslint-disable global-require */
+
 import React from 'react';
 import fetch from '../../core/fetch';
 import BurnerCookie from '../../core/BurnerCookie';
@@ -22,7 +24,7 @@ export default {
     // If we are not authenticated...
     if (!BurnerCookie.isAuthenticated()) {
       // If this route is firing client-side...
-      if (window) {
+      if (typeof window !== 'undefined') {
         // ...fetch the OAuth URI from the server and redirect.
         const response = await fetch('/api/oauth-uri');
         const OAUTH_URI = await response.text();
@@ -35,6 +37,11 @@ export default {
           component: <Home />,
         };
       }
+
+      // If this route is firing server-side, instruct the router to fire an OAuth redirect.
+      return {
+        oauthRedirect: true,
+      };
     }
 
     const Dashboard = await new Promise((resolve) => {
