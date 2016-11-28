@@ -22,9 +22,3 @@ export const analytics = {
   },
 
 };
-
-export const auth = {
-
-  jwt: { secret: process.env.JWT_SECRET || 'Burner App Starter Kit' },
-
-};

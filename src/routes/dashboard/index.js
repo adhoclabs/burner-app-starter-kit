@@ -22,7 +22,7 @@ export default {
 
   async action() {
     // If we are not authenticated...
-    if (!BurnerCookie.isAuthenticated()) {
+    if (typeof window !== 'undefined' && !BurnerCookie.isAuthenticated()) {
       // If this route is firing client-side...
       if (typeof window !== 'undefined') {
         // ...fetch the OAuth URI from the server and redirect.

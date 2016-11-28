@@ -9,6 +9,7 @@
 
 import DataType from 'sequelize';
 import Model from '../sequelize';
+import { encrypt } from '../../core/encryption';
 
 const User = Model.define('User', {
 
@@ -33,6 +34,28 @@ const User = Model.define('User', {
   indexes: [
     { fields: ['token'] },
   ],
+
+  classMethods: {
+    /**
+     * Find or create a user by an (encrypted) authorization token.
+     *
+     * @param {String} token - The unencrypted authorization token.
+     */
+    findOrCreateByToken: function findOrCreateByToken(token) {
+      const encryptedToken = encrypt(token);
+
+      return new Promise((resolve, reject) => {
+        this
+          .findOrCreate({ where: { token: encryptedToken } })
+          .spread((user) => {
+            resolve(user);
+          })
+          .catch((err) => {
+            reject(err);
+          });
+      });
+    },
+  },
 
 });
 

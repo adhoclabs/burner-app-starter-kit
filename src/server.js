@@ -10,9 +10,9 @@
 import 'babel-polyfill';
 import path from 'path';
 import express from 'express';
-import cookieParser from 'cookie-parser';
+import cors from 'cors';
 import bodyParser from 'body-parser';
-import expressJwt from 'express-jwt';
+import session from 'express-session';
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
@@ -22,12 +22,49 @@ import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
 import models from './data/models';
+import { User } from './data/models';
 import routes from './routes';
 import assets from './assets'; // eslint-disable-line import/no-unresolved
-import { port, auth } from './config';
-import { OAUTH_URI } from './constants/oauth';
+import configureStore from './store/configureStore';
+import { setRuntimeVariable } from './actions/runtime';
+import sequelize from './data/sequelize';
+import { port } from './config';
+import { oauth2, OAUTH_URI } from './constants/oauth';
+
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
+
+const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
+const COOKIE_MAX_AGE = 90 * 24 * 60 * 60 * 1000; // Only log in again after 3 months.
+const SESSION = {
+  secret: process.env.BURNER_APP_STARTER_KIT_SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: false,
+    maxAge: COOKIE_MAX_AGE,
+  },
+  store: new SequelizeStore({
+    db: sequelize,
+    expiration: COOKIE_MAX_AGE,
+  }),
+};
 
 const app = express();
+
+if (!IN_DEVELOPMENT) {
+  app.set('trust proxy', 1); // trust first proxy
+
+  SESSION.cookie.secure = true; // serve secure cookies
+
+  // Force redirect to SSL
+  app.get('*', (req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      res.redirect(process.env.BURNER_APP_STARTER_KIT_CLIENT_URL + req.url);
+    } else {
+      next();
+    }
+  });
+}
 
 //
 // Tell any CSS tooling (such as Material UI) to use all vendor prefixes if the
@@ -40,18 +77,11 @@ global.navigator.userAgent = global.navigator.userAgent || 'all';
 // Register Node.js middleware
 // -----------------------------------------------------------------------------
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-
-//
-// Authentication
-// -----------------------------------------------------------------------------
-app.use(expressJwt({
-  secret: auth.jwt.secret,
-  credentialsRequired: false,
-  getToken: req => req.cookies.id_token,
-}));
+app.use(cors());
+app.use(bodyParser.json());
+app.use(session(SESSION));
 
 //
 // OAuth
@@ -59,6 +89,43 @@ app.use(expressJwt({
 
 app.get('/api/oauth-uri', async (req, res) => {
   res.send(OAUTH_URI);
+});
+
+// Callback service parsing the authorization token and asking for the access token
+app.get('/auth/burner/callback', (req, res, next) => {
+  const code = req.query.code;
+  const options = {
+    code,
+  };
+
+  oauth2.authorizationCode.getToken(options, (error, result) => {
+    if (error) {
+      console.error('Access Token Error', error.message);
+      return res.json('Authentication failed');
+    }
+
+    const tokenResult = oauth2.accessToken.create(result);
+
+    let currentUser;
+
+    User.findOrCreateByToken(tokenResult.token.access_token)
+      .then((user) => {
+        currentUser = user;
+
+        // Save the token to the session.
+        req.session.token = currentUser.token; // eslint-disable-line no-param-reassign
+
+        // Redirect to the dashboard
+        res.redirect('/dashboard');
+        return;
+      })
+      .catch((err) => {
+        console.error(err);
+
+        res.status(500).send(err);
+        return next(err);
+      });
+  });
 });
 
 //

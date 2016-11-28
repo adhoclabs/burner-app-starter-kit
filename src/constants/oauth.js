@@ -16,7 +16,7 @@ const OAUTH_CREDS = {
   },
 };
 
-const oauth2 = SimpleOAuth2.create(OAUTH_CREDS);
+export const oauth2 = SimpleOAuth2.create(OAUTH_CREDS);
 
 export const OAUTH_URI = oauth2.authorizationCode.authorizeURL({
   redirect_uri: process.env.BURNER_APP_STARTER_KIT_OAUTH_CALLBACK_URL,
