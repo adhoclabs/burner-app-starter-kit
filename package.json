@@ -38,7 +38,6 @@
     "sequelize": "3.27.0",
     "simple-oauth2": "1.0.1",
     "source-map-support": "0.4.6",
-    "sqlite3": "3.1.8",
     "universal-router": "2.0.0",
     "whatwg-fetch": "2.0.1"
   },

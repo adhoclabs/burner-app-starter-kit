@@ -7,24 +7,16 @@
  * LICENSE.txt file in the root directory of this source tree.
  */
 
-import React from 'react';
+import React, { PropTypes } from 'react';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Home.css';
 
 class Home extends React.Component {
-  static propTypes = {
-    news: PropTypes.arrayOf(PropTypes.shape({
-      title: PropTypes.string.isRequired,
-      link: PropTypes.string.isRequired,
-      contentSnippet: PropTypes.string,
-    })).isRequired,
-  };
-
   render() {
     return (
       <div className={s.root}>
         <div className={s.container}>
-          <h1 className={s.title} style={titleStyle}>Burner App Starter Kit</h1>
+          <h1 className={s.title}>Burner App Starter Kit</h1>
         </div>
       </div>
     );

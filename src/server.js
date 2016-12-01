@@ -25,8 +25,6 @@ import models from './data/models';
 import { User } from './data/models';
 import routes from './routes';
 import assets from './assets'; // eslint-disable-line import/no-unresolved
-import configureStore from './store/configureStore';
-import { setRuntimeVariable } from './actions/runtime';
 import sequelize from './data/sequelize';
 import { port } from './config';
 import { oauth2, OAUTH_URI } from './constants/oauth';
