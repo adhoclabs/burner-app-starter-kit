@@ -24,6 +24,8 @@ export function encrypt(text) {
  * @returns {String} The decrypted text.
  */
 export function decrypt(text) {
+  if ( typeof text === 'undefined') return null;
+
   const decipher = crypto.createDecipher(ALGORITHM, PASSWORD);
   let dec = decipher.update(text, 'hex', 'utf8');
   dec += decipher.final('utf8');

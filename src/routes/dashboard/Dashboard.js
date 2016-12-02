@@ -12,12 +12,13 @@ import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import Layout from '../../components/Layout';
 import s from './Dashboard.css';
 
-function Dashboard({ title }) {
+function Dashboard({ title, burners }) {
   return (
     <Layout>
       <div className={s.root}>
         <div className={s.container}>
           <h1>{title}</h1>
+          {burners.map(burner => burner.id)[0]}
         </div>
       </div>
     </Layout>

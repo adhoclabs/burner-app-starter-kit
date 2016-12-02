@@ -28,6 +28,9 @@ import assets from './assets'; // eslint-disable-line import/no-unresolved
 import sequelize from './data/sequelize';
 import { port } from './config';
 import { oauth2, OAUTH_URI } from './constants/oauth';
+import { decrypt } from './core/encryption';
+import BurnerApi from './core/BurnerApi';
+
 
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
@@ -48,6 +51,8 @@ const SESSION = {
 };
 
 const app = express();
+const router = express.Router();
+
 
 if (!IN_DEVELOPMENT) {
   app.set('trust proxy', 1); // trust first proxy
@@ -127,6 +132,39 @@ app.get('/auth/burner/callback', (req, res, next) => {
 });
 
 //
+// Burner API calls
+// -----------------------------------------------------------------------------
+
+function setupBurnerApi(req) {
+  // Store the encrypted and decrypted authorization tokens
+  req.encryptedToken = req.session.token;
+  req.token = decrypt(req.encryptedToken);
+
+  // Instantiate the API client
+  req.burnerApiClient = new BurnerApi(req.token, process.env.BURNER_API_BASE_URL);
+};
+
+// Fail API requests if unauthorized
+router.use('/', (req, res, next) => {
+  if (!req.session.token) return res.sendStatus(400);
+
+  setupBurnerApi(req);
+
+  next();
+});
+
+app.use('/api', router);
+
+app.get('/api/burners', (req, res, next) => {
+  // TODO: Filter by authorized burners
+  req.burnerApiClient.fetchBurners()
+    .then(burners => {
+      res.json(burners);
+    })
+    .catch(err => next(err));
+});
+
+//
 // Register server-side rendering middleware
 // -----------------------------------------------------------------------------
 app.get('*', async (req, res, next) => {
@@ -144,9 +182,12 @@ app.get('*', async (req, res, next) => {
       },
     };
 
+    setupBurnerApi(req);
+
     const route = await UniversalRouter.resolve(routes, {
       path: req.path,
       query: req.query,
+      token: req.token,
     });
 
     if (route.redirect) {

@@ -20,28 +20,36 @@ export default {
 
   path: '/dashboard',
 
-  async action() {
-    // If we are not authenticated...
-    if (typeof window !== 'undefined' && !BurnerCookie.isAuthenticated()) {
-      // If this route is firing client-side...
-      if (typeof window !== 'undefined') {
+  async action(context) {
+    console.log('rendering dashboard');
+    let burners = [];
+
+    // If the route is being fired client-side...
+    if (typeof window !== 'undefined') {
+
+      // If we are not authenticated...
+      if (!BurnerCookie.isAuthenticated()) {
         // ...fetch the OAuth URI from the server and redirect.
-        const response = await fetch('/api/oauth-uri');
+        const response = await fetch( '/api/oauth-uri' );
         const OAUTH_URI = await response.text();
 
         window.location = OAUTH_URI;
 
         // Simply re-render the homepage
         return {
-          title: 'Burner App Starter Kit',
+          title: '',
           component: <Home />,
         };
+      // If we are authenticated
+      } else {
+        const resp = await fetch('/api/burners', {credentials: 'same-origin'});
+        if (resp.status !== 200) throw new Error(resp.statusText);
+        burners = await resp.json();
       }
-
-      // If this route is firing server-side, instruct the router to fire an OAuth redirect.
-      return {
-        oauthRedirect: true,
-      };
+      // If this route is firing server-side and is not authenticated...
+    } else if (typeof window === 'undefined' && typeof context.token === 'undefined') {
+      // instruct the router to fire an OAuth redirect.
+      return {oauthRedirect: true};
     }
 
     const Dashboard = await new Promise((resolve) => {
@@ -51,7 +59,7 @@ export default {
     return {
       title,
       chunk: 'dashboard',
-      component: <Dashboard title={title} />,
+      component: <Dashboard title={title} burners={burners}/>,
     };
   },
 
