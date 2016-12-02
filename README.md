@@ -7,6 +7,10 @@ The Burner App Starter Kit helps you quickly get started building apps for [Burn
   * [Getting Started](#getting-started)
      * [Requirements](#requirements)
      * [Installation](#installation)
+     * [Walkthrough](#walkthrough)
+        * [Authentication](#authentication)
+        * [Displaying list of Burners](#displaying-list-of-burners)
+        * [Responding to messages](#responding-to-messages)
   * [Deploying to Heroku](#deploying-to-heroku)
   * [Staying up to date](#staying-up-to-date)
   * [More Resources](#more-resources)
@@ -113,6 +117,36 @@ in release (production) mode:
 $ npm start -- --release
 ```
 
+### Walkthrough
+
+The following walkthrough will demonstrate the relevant portions of the code that enable the creation of a Burner app.
+
+#### Authentication
+
+* When a user clicks the "Log In" link on the homepage, the `/dashboard` route is fired, which will [redirect to the Burner OAuth login flow](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/routes/dashboard/index.js#L25-L53) if the user is not authenticated.
+* Once redirected from there back to the app, the app will [request an access token for the user](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L104-L112).
+* The access token is [encrypted and saved to the database and session](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L118-L126).
+* The authorized Burners are [stored in the database and associated to this authorization token](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L127-L142).
+
+#### Displaying list of Burners
+
+* When the `/dashboard` route is again fired client-side after the user has authenticated, [a request is made to `/api/burners`](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/routes/dashboard/index.js#L41-L48).
+* When the `api/burners` route is triggered server-side, it first [runs through the authorization middleware](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L163-L167) to ensure that the encrypted authorization token is part of the user's session.
+* A request is made to [fetch the user's Burners](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L163-L167).
+* The encrypted authorization token is used to [find the appropriate `User` record in the database](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L175-L179).
+* The list of Burners returned by the Burner API is [compared to the list of authorized Burners stored in the database, and only the authorized burners are returned by the call to `/api/burners`](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L181-L188).
+* The authorized Burners are [passed to the `Dashboard` component](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/routes/dashboard/index.js#L62).
+* The `Dashboard` component [renders the authorized Burners](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/routes/dashboard/Dashboard.js#L17-L31).
+
+#### Responding to messages
+
+* When a message is sent to an authorized Burner, a `POST` webhook request will be sent to `/messages`.
+* The `/messages` [route is fired](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L195).
+* Any messages that aren't text [are ignored](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L200-L205).
+* The `burnerId` param of the webhook request is used to [find a matching authorized Burner in the database](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L209-L214).
+* The associated user's authorization token is [decrypted and used to instantiate a new `BurnerApi` client object](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L219-L223).
+* The message is [reversed and sent back to the texter](https://github.com/adhoclabs/burner-app-starter-kit/blob/5b613590c3b3cb265182b04a8363370c9e941030/src/server.js#L225-L230).
+
 ## Deploying to Heroku
 
 ### 1. Click the Deploy to Heroku button
@@ -142,6 +176,8 @@ Run the following command to build and then deploy your app to Heroku:
 ```console
 $ npm run deploy
 ```
+
+**You can now text a message to any of your authorized Burners.** It should respond with a reversed version of your message.
 
 ## Staying up to date
 
