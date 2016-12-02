@@ -23,8 +23,8 @@ class Dashboard extends React.Component {
 
     return (
       <div className={s.burners}>
-        {this.props.burners.map( ( burner, index ) => (
-          <Burner key={index} name={burner.name}/>
+        {burners.map((burner, index) => (
+          <Burner key={index} {...burner}/>
         ))}
       </div>
     )

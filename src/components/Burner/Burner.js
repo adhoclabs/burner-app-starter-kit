@@ -3,11 +3,14 @@ import cx from 'classnames';
 import withStyles from 'isomorphic-style-loader/lib/withStyles';
 import s from './Burner.css';
 
+import {formatLocal} from '../../core/phone';
+
 class Burner extends React.Component {
   render() {
     return (
       <div className={cx(s.root, this.props.className)}>
-        <span className={s.burnerName}>{this.props.name}</span>
+        <div className={s.name}>{this.props.name}</div>
+        <div className={s.number}>{formatLocal(this.props.phoneNumber)}</div>
       </div>
     );
   }

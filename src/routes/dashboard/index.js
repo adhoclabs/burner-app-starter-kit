@@ -57,6 +57,7 @@ export default {
     });
 
     return {
+      title: 'Dashboard',
       chunk: 'dashboard',
       component: <Dashboard loading={loading} burners={burners}/>,
     };
