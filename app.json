@@ -1,0 +1,43 @@
+{
+  "name": "Burner App Starter Kit",
+  "description": "A React + Express boilerplate project for building Burner apps",
+  "repository": "https://github.com/voxable-labs/ask",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["react", "express", "burner"],
+  "env": {
+    "BURNER_API_BASE_URL": {
+      "description": "The base URL for the Burner API",
+      "value": "https://api.burnerapp.com"
+    },
+    "OAUTH_CLIENT_ID": {
+      "description": "The OAuth client ID for your Burner app"
+    },
+    "OAUTH_CLIENT_SECRET": {
+      "description": "The OAuth cleint secret for your Burner app"
+    },
+    "OAUTH_AUTHORIZE_HOST": {
+      "description": "The Oauth authorization host (the Burner web app)",
+      "value": "https://app.burnerapp.com/"
+    },
+    "OAUTH_CALLBACK_URL": {
+      "description": "The OAuth callback URL. Change YOURAPPNAME to your Heroku app's name",
+      "value": "https://YOURAPPNAME.herokuapp.com/auth/burner/callback"
+    },
+    "OAUTH_STATE_SECRET": {
+      "description": "The OAuth state secret",
+      "generator": "secret"
+    },
+    "CLIENT_URL": {
+      "description": "The URL to your Burner app. Change YOURAPPNAME to your Heroku app's name",
+      "value": "https://YOURAPPNAME.herokuapp.com/auth/burner/callback"
+    },
+    "KEY_ENCRYPTION_PASSWORD": {
+      "description": "The password used to encrypt OAuth tokens",
+      "generator": "secret"
+    },
+    "SESSION_SECRET": {
+      "description": "The session secret",
+      "generator": "secret"
+    }
+  }
+}
