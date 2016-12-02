@@ -11,6 +11,10 @@ import sequelize from '../sequelize';
 import User from './User';
 import Burner from './Burner';
 
+// Associations
+User.hasMany(Burner, {foreignKey: 'userId'});
+Burner.belongsTo(User, {foreignKey: 'userId'});
+
 function sync(...args) {
   return sequelize.sync(...args);
 }

@@ -1,6 +1,5 @@
 import DataType from 'sequelize';
 import Model from '../sequelize';
-import {encrypt} from '../../core/encryption';
 
 const Burner = Model.define('Burner', {
   id: {
