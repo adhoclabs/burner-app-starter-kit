@@ -6,20 +6,20 @@ const OAUTH_SCOPES = 'messages:connect burners:read burners:write contacts:write
 
 const OAUTH_CREDS = {
   client: {
-    id: process.env.BURNER_APP_STARTER_KIT_OAUTH_CLIENT_ID,
-    secret: process.env.BURNER_APP_STARTER_KIT_OAUTH_CLIENT_SECRET,
+    id: process.env.OAUTH_CLIENT_ID,
+    secret: process.env.OAUTH_CLIENT_SECRET,
   },
   auth: {
-    authorizeHost: process.env.BURNER_APP_STARTER_KIT_OAUTH_AUTHORIZE_HOST,
-    tokenHost: process.env.BURNER_APP_STARTER_KIT_OAUTH_TOKEN_HOST,
-    tokenPath: process.env.BURNER_APP_STARTER_KIT_OAUTH_TOKEN_PATH,
+    authorizeHost: process.env.OAUTH_AUTHORIZE_HOST,
+    tokenHost: process.env.BURNER_API_BASE_URL,
+    tokenPath: 'oauth/access',
   },
 };
 
 export const oauth2 = SimpleOAuth2.create(OAUTH_CREDS);
 
 export const OAUTH_URI = oauth2.authorizationCode.authorizeURL({
-  redirect_uri: process.env.BURNER_APP_STARTER_KIT_OAUTH_CALLBACK_URL,
+  redirect_uri: process.env.OAUTH_CALLBACK_URL,
   scope: OAUTH_SCOPES,
-  state: process.env.BURNER_APP_STARTER_KIT_OAUTH_STATE_SECRET,
+  state: process.env.OAUTH_STATE_SECRET,
 });

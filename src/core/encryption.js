@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-ctr';
-const PASSWORD = process.env.BURNER_APP_STARTER_KIT_KEY_ENCRYPTION_PASSWORD;
+const PASSWORD = process.env.KEY_ENCRYPTION_PASSWORD;
 
 /**
  * Encrypt the specified text.

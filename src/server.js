@@ -40,7 +40,7 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 const COOKIE_MAX_AGE = 90 * 24 * 60 * 60 * 1000; // Only log in again after 3 months.
 const SESSION = {
-  secret: process.env.BURNER_APP_STARTER_KIT_SESSION_SECRET,
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -65,7 +65,7 @@ if (!IN_DEVELOPMENT) {
   // Force redirect to SSL
   app.get('*', (req, res, next) => {
     if (req.headers['x-forwarded-proto'] !== 'https') {
-      res.redirect(process.env.BURNER_APP_STARTER_KIT_CLIENT_URL + req.url);
+      res.redirect(process.env.CLIENT_URL + req.url);
     } else {
       next();
     }
