@@ -17,6 +17,30 @@
  * Base styles
  * ========================================================================== */
 
+* {
+  margin: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+[data-reactroot] {
+  height: 100%;
+}
+
+.pageWrap {
+  min-height: 100%;
+  /* equal to footer height */
+  margin-bottom: calc(var(--footer-height) * -1);
+}
+
+.pageWrap:after {
+  content: "";
+  display: block;
+  height: var(--footer-height);
+}
+
 html {
   color: #222;
   font-weight: 100;

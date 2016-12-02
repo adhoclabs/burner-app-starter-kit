@@ -12,6 +12,7 @@
 .root {
   background: #333;
   color: #fff;
+  height: calc(var(--footer-height) / 2);
 }
 
 .container {
