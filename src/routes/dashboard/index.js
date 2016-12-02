@@ -21,7 +21,6 @@ export default {
   path: '/dashboard',
 
   async action(context) {
-    console.log('rendering dashboard');
     let burners = [];
 
     // If the route is being fired client-side...

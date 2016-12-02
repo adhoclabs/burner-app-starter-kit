@@ -18,6 +18,8 @@ import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
 import difference from 'lodash/difference';
+import filter from 'lodash/filter';
+import includes from 'lodash/includes';
 
 import App from './components/App';
 import Html from './components/Html';
@@ -137,7 +139,7 @@ app.get('/auth/burner/callback', (req, res, next) => {
         Promise.all(burnerUpsertCalls)
           .then(() => {
             // Redirect to the dashboard
-            res.redirect('/dashboard');
+            return res.redirect('/dashboard');
           })
       })
       .catch(err => next(err));
@@ -169,10 +171,23 @@ router.use('/', (req, res, next) => {
 app.use('/api', router);
 
 app.get('/api/burners', (req, res, next) => {
-  // TODO: Filter by authorized burners
   req.burnerApiClient.fetchBurners()
     .then(burners => {
-      res.json(burners);
+      User
+        .find({
+          where: {token: req.encryptedToken},
+          include: [Burner]
+        })
+        .then(user => {
+          const storedBurnerIds = user.Burners.map(burner => burner.id);
+
+          // If the list of Burner IDs we have stored isn't equal to what's
+          // been returned, only return what has been stored, as those are the only
+          // authorized burners.
+          const authorizedBurners = filter(burners, (burner) => includes(storedBurnerIds, burner.id));
+
+          return res.json(authorizedBurners);
+        });
     })
     .catch(err => next(err));
 });
