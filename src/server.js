@@ -17,12 +17,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/server';
 import UniversalRouter from 'universal-router';
 import PrettyError from 'pretty-error';
+import difference from 'lodash/difference';
+
 import App from './components/App';
 import Html from './components/Html';
 import { ErrorPageWithoutStyle } from './routes/error/ErrorPage';
 import errorPageStyle from './routes/error/ErrorPage.css';
 import models from './data/models';
-import { User } from './data/models';
+import { User, Burner } from './data/models';
 import routes from './routes';
 import assets from './assets'; // eslint-disable-line import/no-unresolved
 import sequelize from './data/sequelize';
@@ -30,7 +32,6 @@ import { port } from './config';
 import { oauth2, OAUTH_URI } from './constants/oauth';
 import { decrypt } from './core/encryption';
 import BurnerApi from './core/BurnerApi';
-
 
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
@@ -97,20 +98,22 @@ app.get('/api/oauth-uri', async (req, res) => {
 // Callback service parsing the authorization token and asking for the access token
 app.get('/auth/burner/callback', (req, res, next) => {
   const code = req.query.code;
-  const options = {
-    code,
-  };
+  const options = {code};
 
   oauth2.authorizationCode.getToken(options, (error, result) => {
     if (error) {
-      console.error('Access Token Error', error.message);
-      return res.json('Authentication failed');
+      return next(error);
     }
 
-    const tokenResult = oauth2.accessToken.create(result);
+    const burners = result.connected_burners;
+    const authorizedBurnerIds = burners.map(burner => burner.id);
 
+    const tokenResult = oauth2.accessToken.create(result);
+    const burnerUpsertCalls = [];
     let currentUser;
 
+    // Add any new connected burners for this user to the database. If the token for this
+    // user has changed, update all authorized burners to reference the new user object.
     User.findOrCreateByToken(tokenResult.token.access_token)
       .then((user) => {
         currentUser = user;
@@ -118,16 +121,26 @@ app.get('/auth/burner/callback', (req, res, next) => {
         // Save the token to the session.
         req.session.token = currentUser.token; // eslint-disable-line no-param-reassign
 
-        // Redirect to the dashboard
-        res.redirect('/dashboard');
-        return;
+        return currentUser.getBurners();
       })
-      .catch((err) => {
-        console.error(err);
+      .then(storedBurners => {
+        const storedBurnerIds = storedBurners.map(burner => burner.id);
 
-        res.status(500).send(err);
-        return next(err);
-      });
+        // If the list of Burner IDs we have stored isn't equal to what's
+        // been returned, create some new ones.
+        const newBurnerIds = difference(authorizedBurnerIds, storedBurnerIds);
+
+        newBurnerIds.forEach(burnerId => {
+          burnerUpsertCalls.push(Burner.upsert({id: burnerId, userId: currentUser.id}));
+        });
+
+        Promise.all(burnerUpsertCalls)
+          .then(() => {
+            // Redirect to the dashboard
+            res.redirect('/dashboard');
+          })
+      })
+      .catch(err => next(err));
   });
 });
 

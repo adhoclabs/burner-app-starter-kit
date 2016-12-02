@@ -10,6 +10,7 @@
 import DataType from 'sequelize';
 import Model from '../sequelize';
 import { encrypt } from '../../core/encryption';
+import Burner from './Burner';
 
 const User = Model.define('User', {
 
@@ -58,5 +59,8 @@ const User = Model.define('User', {
   },
 
 });
+
+// Associations
+User.hasMany(Burner, {foreignKey: 'userId'});
 
 export default User;

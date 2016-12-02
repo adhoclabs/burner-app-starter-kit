@@ -9,10 +9,11 @@
 
 import sequelize from '../sequelize';
 import User from './User';
+import Burner from './Burner';
 
 function sync(...args) {
   return sequelize.sync(...args);
 }
 
 export default { sync };
-export { User };
+export { User, Burner };
