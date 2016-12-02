@@ -191,6 +191,55 @@ app.get('/api/burners', (req, res, next) => {
     .catch(err => next(err));
 });
 
+// Message receive callback
+app.post('/messages', (req, res, next) => {
+  const {type, payload, fromNumber, burnerId} = req.body;
+  const phoneNumber = fromNumber;
+  const INVALID_BURNER = new Error('Invalid Burner');
+
+  // Ignore anything that's not a text message
+  if (type !== 'inboundText') {
+    res.sendStatus(200);
+    console.log('Not a text message');
+    return next();
+  }
+
+  res.sendStatus(200);
+
+  // Find the token for this burner
+  Burner
+    .find({
+      where: {id: burnerId},
+      include: [User]
+    })
+    .then(burner => {
+      // Throw an error if no matching burner was found
+      if (!burner) throw INVALID_BURNER;
+
+      // Decrypt the user's token
+      const token = decrypt(burner.User.token);
+
+      // Instantiate the API client
+      const burnerApiClient = new BurnerApi(token, process.env.BURNER_API_BASE_URL);
+
+      // Respond by echoing back the same message, reversed
+      return burnerApiClient.sendMessage({
+        body: payload.split('').reverse().join(''),
+        burnerId,
+        phoneNumber
+      })
+    })
+    .catch((err) => {
+      switch (err) {
+        case INVALID_BURNER:
+          next(INVALID_BURNER);
+          break;
+        default:
+          next(err);
+      }
+    });
+});
+
 //
 // Register server-side rendering middleware
 // -----------------------------------------------------------------------------
