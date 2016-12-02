@@ -1,0 +1,11 @@
+@import '../variables.css';
+
+.root {
+  border-top: 2px solid var(--brand-color);
+  padding-top: 1em;
+}
+
+.burnerName {
+  font-size: 24px;
+  font-weight: bold;
+}

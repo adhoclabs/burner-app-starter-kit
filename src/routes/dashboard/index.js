@@ -14,14 +14,13 @@ import fetch from '../../core/fetch';
 import BurnerCookie from '../../core/BurnerCookie';
 import Home from '../home/Home';
 
-const title = 'Dashboard';
-
 export default {
 
   path: '/dashboard',
 
   async action(context) {
     let burners = [];
+    let loading = true;
 
     // If the route is being fired client-side...
     if (typeof window !== 'undefined') {
@@ -41,6 +40,8 @@ export default {
         };
       // If we are authenticated
       } else {
+        loading = false;
+
         const resp = await fetch('/api/burners', {credentials: 'same-origin'});
         if (resp.status !== 200) throw new Error(resp.statusText);
         burners = await resp.json();
@@ -56,9 +57,8 @@ export default {
     });
 
     return {
-      title,
       chunk: 'dashboard',
-      component: <Dashboard title={title} burners={burners}/>,
+      component: <Dashboard loading={loading} burners={burners}/>,
     };
   },
 
