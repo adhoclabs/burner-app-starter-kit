@@ -60,7 +60,7 @@ $ cp .env.example .env
 
 Now open the `.env` file in your editor and supply the following values indicated below:
 
-```json
+```javascript
 {
   "burner_api": {
     "base_url": "http://api.burnerapp.com",
