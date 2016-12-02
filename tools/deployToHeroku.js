@@ -15,9 +15,9 @@ import run from './run';
 function getRemote(slot) {
   return {
     name: slot || 'production',
-    url: `https://example${slot ? `-${slot}` : ''}.scm.azurewebsites.net:443/example.git`,
+    url: `https://git.heroku.com/${process.env.HEROKU_APP_NAME}.git`,
     branch: 'master',
-    website: `http://example${slot ? `-${slot}` : ''}.azurewebsites.net`,
+    website: `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`,
   };
 }
 
@@ -25,7 +25,7 @@ function getRemote(slot) {
  * Deploy the contents of the `/build` folder to a remote
  * server via Git. Example: `npm run deploy -- production`
  */
-async function deployToAzureWebApps() {
+async function deployToHeroku() {
   // By default deploy to the staging deployment slot
   const remote = getRemote(process.argv.includes('--production') ? null : 'staging');
 
@@ -57,4 +57,4 @@ async function deployToAzureWebApps() {
   console.log(`${remote.website} -> ${response.status}`);
 }
 
-export default deployToAzureWebApps;
+export default deployToHeroku;
