@@ -13,7 +13,7 @@
       "description": "The OAuth client ID for your Burner app"
     },
     "OAUTH_CLIENT_SECRET": {
-      "description": "The OAuth cleint secret for your Burner app"
+      "description": "The OAuth client secret for your Burner app"
     },
     "OAUTH_AUTHORIZE_HOST": {
       "description": "The Oauth authorization host (the Burner web app)",
@@ -40,7 +40,7 @@
       "generator": "secret"
     },
     "HEROKU": {
-      "description": "Leave as is. Used to properly instantiate database connection.",
+      "description": "Leave as-is. Used to properly instantiate database connection.",
       "value": "true"
     }
   },
