@@ -38,6 +38,11 @@
     "SESSION_SECRET": {
       "description": "The session secret",
       "generator": "secret"
+    },
+    "HEROKU": {
+      "description": "Leave as is. Used to properly instantiate database connection.",
+      "value": "true"
     }
-  }
+  },
+  "addons": ["heroku-postgresql"]
 }

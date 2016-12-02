@@ -56,7 +56,6 @@ const SESSION = {
 const app = express();
 const router = express.Router();
 
-
 if (!IN_DEVELOPMENT) {
   app.set('trust proxy', 1); // trust first proxy
 

@@ -10,10 +10,22 @@
 import Sequelize from 'sequelize';
 import { databaseUrl } from '../config';
 
-const sequelize = new Sequelize(databaseUrl, {
+let databaseOpts = {
   define: {
     freezeTableName: true,
-  },
-});
+  }
+};
+
+// Use correct connection parameters for Heroku deployments
+if (process.env.HEROKU) {
+  databaseOpts = Object.assign(databaseOpts, {
+    dialect: 'postgres',
+    dialectOptions: {
+      ssl: true
+    }
+  });
+}
+
+const sequelize = new Sequelize(databaseUrl, databaseOpts);
 
 export default sequelize;
