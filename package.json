@@ -15,7 +15,7 @@
     "cors": "2.8.1",
     "express": "4.14.0",
     "express-graphql": "0.6.1",
-    "express-jwt": "5.1.0",
+    "express-jwt": "6.0.0",
     "express-session": "1.14.2",
     "fastclick": "1.0.6",
     "fbjs": "0.8.6",
